@@ -1,14 +1,18 @@
-import { RefObject, useEffect, useRef, useState } from "react"
+import { RefObject, useCallback, useEffect, useRef, useState } from "react"
 
 
 export const useHover = (): {hovered: boolean, ref: RefObject<HTMLDivElement>} => {
 	const ref = useRef<HTMLDivElement>(null);
 	const [hovered, setHovered] = useState(false);
 
-	useEffect(() => {
-		const handleMouseOver = () => setHovered(true);
-		const handleMouseOut = () => setHovered(false);
+	const handleMouseOver = useCallback(() => {
+		setHovered(true);
+	}, [setHovered]);
+	const handleMouseOut = useCallback(() => {
+		setHovered(false);
+	}, [setHovered]);
 
+	useEffect(() => {
 		const element = ref.current;
 		if (element) {
 		  element.addEventListener('mouseover', handleMouseOver);
@@ -19,7 +23,7 @@ export const useHover = (): {hovered: boolean, ref: RefObject<HTMLDivElement>} =
 			element?.removeEventListener('mouseover', handleMouseOver);
 			element?.removeEventListener('mouseout', handleMouseOut);
 		}
-	}, [ref])
+	}, [handleMouseOut, handleMouseOver, ref])
 
 	return {hovered, ref}
 }
